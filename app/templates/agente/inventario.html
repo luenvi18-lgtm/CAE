@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge_estado, select with context %}
+{% block titulo %}{{ titulo }}{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h1 class="h4 mb-0">{{ titulo }} <span class="badge text-bg-light">{{ equipos|length }}</span></h1>
+  <div class="btn-group">
+    <a class="btn btn-sm {{ 'btn-primary' if estado == 'entrada' else 'btn-outline-primary' }}" href="{{ url_for('agente.inventario', estado='entrada') }}">Adentro</a>
+    <a class="btn btn-sm {{ 'btn-primary' if estado == 'salida' else 'btn-outline-primary' }}" href="{{ url_for('agente.inventario', estado='salida') }}">Retirados</a>
+  </div>
+</div>
+
+<form class="row g-2 align-items-end mb-3">
+  <div class="col-md-4">
+    <label class="form-label small" for="q">Buscar</label>
+    <input class="form-control" id="q" name="q" placeholder="Cédula, nombre, marca, modelo o serial" value="{{ filtros.q }}">
+  </div>
+  <div class="col-md-3">{{ select('tipo', 'Tipo', TIPOS_EQUIPO, filtros.tipo, vacio='Todos', requerido=False) }}</div>
+  <div class="col-md-3">{{ select('division', 'División', DIVISIONES, filtros.division, vacio='Todas', requerido=False) }}</div>
+  <div class="col-md-2"><button class="btn btn-outline-primary w-100">Filtrar</button></div>
+</form>
+
+<div class="card shadow-sm">
+  {% if equipos %}
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr><th>Usuario</th><th>División</th><th>Equipo</th><th>Serial</th><th>Estado</th><th>{{ 'Fecha de entrada' if estado == 'entrada' else 'Fecha de salida' }}</th></tr>
+      </thead>
+      <tbody>
+        {% for equipo in equipos %}
+        <tr>
+          <td><a href="{{ url_for('agente.consultar', cedula=equipo.cedula_usuario) }}">{{ equipo.usuario.nombre_completo }}</a>
+            <div class="small text-muted">C.C. {{ equipo.cedula_usuario }}</div></td>
+          <td class="small">{{ equipo.usuario.division }}</td>
+          <td>{{ equipo.descripcion }}</td>
+          <td class="small">{{ equipo.serial or '—' }}</td>
+          <td>{{ badge_estado(equipo.estado) }}</td>
+          <td class="small">{{ equipo.ultimo_movimiento.fecha|fecha if equipo.ultimo_movimiento else '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="card-body text-muted">No hay equipos para mostrar.</div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% from "_macros.html" import badge_estado, csrf %}
+{% set movimientos = pagina.items if pagina is defined else recientes %}
+{% if movimientos %}
+<div class="table-responsive">
+  <table class="table table-hover mb-0">
+    <thead class="table-light">
+      <tr>
+        <th>Fecha</th><th>Movimiento</th><th>Usuario</th><th>Equipo</th><th>Agente</th><th>Observación</th>
+        {% if current_user.es_superusuario %}<th class="text-end">Acciones</th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in movimientos %}
+      <tr>
+        <td class="small text-nowrap">{{ m.fecha|fecha }}</td>
+        <td>{{ badge_estado(m.tipo) }}</td>
+        <td>
+          <a href="{{ url_for('agente.consultar', cedula=m.equipo.cedula_usuario) }}">{{ m.equipo.usuario.nombre_completo }}</a>
+          <div class="small text-muted">C.C. {{ m.equipo.cedula_usuario }}</div>
+        </td>
+        <td>{{ m.equipo.descripcion }}{% if m.equipo.serial %}<div class="small text-muted">S/N {{ m.equipo.serial }}</div>{% endif %}</td>
+        <td class="small">{{ m.agente.nombre_completo if m.agente else '—' }}</td>
+        <td class="small">{{ m.observacion or '' }}</td>
+        {% if current_user.es_superusuario %}
+        <td class="text-end text-nowrap">
+          <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin.editar_movimiento', movimiento_id=m.id) }}" title="Editar"><i class="bi bi-pencil"></i></a>
+          <form method="post" action="{{ url_for('admin.eliminar_movimiento', movimiento_id=m.id) }}" class="d-inline"
+                onsubmit="return confirm('¿Eliminar este movimiento del historial?');">
+            {{ csrf() }}
+            <button class="btn btn-sm btn-outline-danger" title="Eliminar"><i class="bi bi-trash"></i></button>
+          </form>
+        </td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card-body text-muted">No hay movimientos registrados.</div>
+{% endif %}

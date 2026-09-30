@@ -1,0 +1,38 @@
+:root {
+  --cae-verde: #0b6e4f;
+  --cae-verde-oscuro: #08553d;
+}
+
+body {
+  background: #f4f6f8;
+}
+
+.barra {
+  background: var(--cae-verde);
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--cae-verde);
+  --bs-btn-border-color: var(--cae-verde);
+  --bs-btn-hover-bg: var(--cae-verde-oscuro);
+  --bs-btn-hover-border-color: var(--cae-verde-oscuro);
+  --bs-btn-active-bg: var(--cae-verde-oscuro);
+}
+
+.tarjeta-login {
+  max-width: 460px;
+}
+
+.resumen .display-6 {
+  font-weight: 600;
+}
+
+.table td,
+.table th {
+  vertical-align: middle;
+}
+
+.navbar .nav-link,
+.navbar-text {
+  white-space: nowrap;
+}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge_estado %}
+{% block titulo %}Panel{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h1 class="h4 mb-0">Panel de control</h1>
+  <form class="d-flex gap-2" action="{{ url_for('agente.consultar') }}">
+    <input class="form-control" name="cedula" placeholder="Cédula del usuario" inputmode="numeric" required>
+    <button class="btn btn-primary text-nowrap"><i class="bi bi-search"></i> Consultar</button>
+  </form>
+</div>
+
+<div class="row g-3 resumen mb-4">
+  <div class="col-6 col-lg">
+    <a class="card shadow-sm text-decoration-none h-100" href="{{ url_for('agente.inventario', estado='entrada') }}">
+      <div class="card-body"><div class="text-muted small">Equipos adentro</div><div class="display-6 text-success">{{ resumen.adentro }}</div></div>
+    </a>
+  </div>
+  <div class="col-6 col-lg">
+    <a class="card shadow-sm text-decoration-none h-100" href="{{ url_for('agente.inventario', estado='salida') }}">
+      <div class="card-body"><div class="text-muted small">Equipos retirados</div><div class="display-6 text-secondary">{{ resumen.retirados }}</div></div>
+    </a>
+  </div>
+  <div class="col-6 col-lg">
+    <div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Equipos registrados</div><div class="display-6">{{ resumen.equipos }}</div></div></div>
+  </div>
+  <div class="col-6 col-lg">
+    <a class="card shadow-sm text-decoration-none h-100" href="{{ url_for('agente.usuarios') }}">
+      <div class="card-body"><div class="text-muted small">Usuarios</div><div class="display-6">{{ resumen.usuarios }}</div></div>
+    </a>
+  </div>
+  <div class="col-12 col-lg">
+    <div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Movimientos hoy</div><div class="display-6">{{ resumen.movimientos_hoy }}</div></div></div>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-header bg-white d-flex justify-content-between align-items-center">
+    <span class="fw-semibold">Últimos movimientos</span>
+    <a class="small" href="{{ url_for('agente.historial') }}">Ver historial completo</a>
+  </div>
+  {% include "agente/_tabla_movimientos.html" with context %}
+</div>
+{% endblock %}

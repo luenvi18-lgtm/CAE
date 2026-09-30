@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge_estado %}
+{% block titulo %}Mis equipos{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <div>
+    <h1 class="h4 mb-0">Mis equipos</h1>
+    <div class="text-muted small">{{ current_user.nombre_completo }} · C.C. {{ current_user.cedula }} · {{ current_user.division }}</div>
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('usuario.nuevo_equipo') }}"><i class="bi bi-plus-lg"></i> Registrar equipo</a>
+</div>
+
+{% if equipos %}
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr><th>Tipo</th><th>Marca</th><th>Modelo</th><th>Serial</th><th>Estado</th><th>Último movimiento</th></tr>
+      </thead>
+      <tbody>
+        {% for equipo in equipos %}
+        <tr>
+          <td>{{ equipo.tipo }}</td>
+          <td>{{ equipo.marca }}</td>
+          <td>{{ equipo.modelo }}</td>
+          <td>{{ equipo.serial or '—' }}</td>
+          <td>{{ badge_estado(equipo.estado) }}</td>
+          <td class="small">{{ equipo.ultimo_movimiento.fecha|fecha if equipo.ultimo_movimiento else 'Sin movimientos' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="alert alert-info">Aún no tienes equipos registrados.</div>
+{% endif %}
+{% endblock %}

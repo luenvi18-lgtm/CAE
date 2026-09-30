@@ -1,0 +1,41 @@
+{% macro csrf() %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endmacro %}
+
+{% macro badge_estado(estado) %}
+  {% if estado == 'entrada' %}
+    <span class="badge text-bg-success"><i class="bi bi-box-arrow-in-right"></i> Entrada</span>
+  {% else %}
+    <span class="badge text-bg-secondary"><i class="bi bi-box-arrow-right"></i> Salida</span>
+  {% endif %}
+{% endmacro %}
+
+{% macro select(nombre, etiqueta, opciones, valor, vacio=None, requerido=True) %}
+  <label class="form-label" for="{{ nombre }}">{{ etiqueta }}</label>
+  <select class="form-select" id="{{ nombre }}" name="{{ nombre }}" {% if requerido %}required{% endif %}>
+    {% if vacio is not none %}<option value="">{{ vacio }}</option>{% endif %}
+    {% if opciones is mapping %}
+      {% for clave, texto in opciones.items() %}
+        <option value="{{ clave }}" {% if valor == clave %}selected{% endif %}>{{ texto }}</option>
+      {% endfor %}
+    {% else %}
+      {% for opcion in opciones %}
+        <option value="{{ opcion }}" {% if valor == opcion %}selected{% endif %}>{{ opcion }}</option>
+      {% endfor %}
+    {% endif %}
+  </select>
+{% endmacro %}
+
+{% macro campos_equipo(form) %}
+  <div class="col-md-6">{{ select('tipo', 'Tipo de equipo', TIPOS_EQUIPO, form.get('tipo'), vacio='Seleccione…') }}</div>
+  <div class="col-md-6">
+    <label class="form-label" for="marca">Marca</label>
+    <input class="form-control" id="marca" name="marca" maxlength="60" required value="{{ form.get('marca', '') }}">
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="modelo">Modelo</label>
+    <input class="form-control" id="modelo" name="modelo" maxlength="60" required value="{{ form.get('modelo', '') }}">
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="serial">Serial <span class="text-muted">(opcional)</span></label>
+    <input class="form-control" id="serial" name="serial" maxlength="60" value="{{ form.get('serial', '') }}">
+  </div>
+{% endmacro %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% from "_macros.html" import select with context %}
+{% block titulo %}Historial{% endblock %}
+{% block contenido %}
+<h1 class="h4 mb-3">Historial de ingresos y salidas <span class="badge text-bg-light">{{ pagina.total }}</span></h1>
+
+<form class="row g-2 align-items-end mb-3">
+  <div class="col-md-3">
+    <label class="form-label small" for="cedula">Cédula del usuario</label>
+    <input class="form-control" id="cedula" name="cedula" inputmode="numeric" value="{{ filtros.cedula }}">
+  </div>
+  <div class="col-md-2">{{ select('tipo', 'Movimiento', ESTADOS, filtros.tipo, vacio='Todos', requerido=False) }}</div>
+  <div class="col-md-2">
+    <label class="form-label small" for="desde">Desde</label>
+    <input class="form-control" type="date" id="desde" name="desde" value="{{ filtros.desde }}">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label small" for="hasta">Hasta</label>
+    <input class="form-control" type="date" id="hasta" name="hasta" value="{{ filtros.hasta }}">
+  </div>
+  <div class="col-md-3 d-flex gap-2">
+    <button class="btn btn-outline-primary flex-fill">Filtrar</button>
+    <a class="btn btn-outline-secondary" href="{{ url_for('agente.historial') }}">Limpiar</a>
+  </div>
+</form>
+
+<div class="card shadow-sm">
+  {% include "agente/_tabla_movimientos.html" with context %}
+</div>
+
+{% if pagina.pages > 1 %}
+<nav class="mt-3" aria-label="Páginas">
+  <ul class="pagination justify-content-center">
+    {% set args = request.args.to_dict() %}
+    <li class="page-item {{ 'disabled' if not pagina.has_prev }}">
+      <a class="page-link" href="{{ url_for('agente.historial', **dict(args, pagina=pagina.prev_num or 1)) }}">Anterior</a>
+    </li>
+    <li class="page-item disabled"><span class="page-link">Página {{ pagina.page }} de {{ pagina.pages }}</span></li>
+    <li class="page-item {{ 'disabled' if not pagina.has_next }}">
+      <a class="page-link" href="{{ url_for('agente.historial', **dict(args, pagina=pagina.next_num or pagina.pages)) }}">Siguiente</a>
+    </li>
+  </ul>
+</nav>
+{% endif %}
+{% endblock %}
