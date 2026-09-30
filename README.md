@@ -42,38 +42,47 @@ Reglas:
   movimiento más reciente.
 - Las horas se guardan en hora de Colombia (UTC-5).
 
-## Instalación
+## Inicio rápido
+
+Requisito: [Python 3.10 o superior](https://www.python.org/downloads/). En
+Windows, marque la casilla **Add Python to PATH** al instalarlo.
+
+1. Descargue el proyecto (botón **Code → Download ZIP** en GitHub) y
+   descomprímalo.
+2. Ejecute el script de inicio:
+   - **Windows:** doble clic en `iniciar.bat`.
+   - **Linux / macOS:** `./iniciar.sh` en una terminal.
+3. La primera vez instala las dependencias y le pide los datos del primer
+   **súper usuario** (cédula, nombres, apellidos y contraseña).
+4. Abra http://localhost:5000 en el navegador.
+
+Los agentes de la portería pueden entrar desde otros computadores de la
+misma red con `http://IP-DE-ESTE-COMPUTADOR:5000`. Si no carga, permita el
+puerto 5000 en el firewall de Windows. Para detener el servidor, presione
+`Ctrl+C` en la ventana negra.
+
+## Instalación manual
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate          # En Windows: .venv\Scripts\activate
 pip install -r requirements.txt
+python wsgi.py                     # http://localhost:5000
 ```
 
-## Crear el primer súper usuario
-
-Opción 1, con el comando interactivo:
+Para crear o ascender un súper usuario en cualquier momento:
 
 ```bash
 flask --app wsgi crear-superusuario
 ```
 
-Opción 2, con variables de entorno (se crea al iniciar si no existe):
-
-```bash
-export SUPERUSUARIO_CEDULA=1234567
-export SUPERUSUARIO_PASSWORD='una-clave-segura'
-```
-
-## Ejecutar
-
-```bash
-export SECRET_KEY='una-cadena-larga-y-aleatoria'
-flask --app wsgi run                # http://127.0.0.1:5000
-```
+O con variables de entorno (se crea al iniciar si no existe):
+`SUPERUSUARIO_CEDULA` y `SUPERUSUARIO_PASSWORD`.
 
 Las tablas se crean automáticamente. Por defecto se usa SQLite en
-`instance/cae.db`. Para otro motor, defina `DATABASE_URL` e instale su
+`instance/cae.db` (haga copias de seguridad de ese archivo). La clave
+secreta de las sesiones se genera sola en `instance/secret_key`; también
+puede definirla con la variable `SECRET_KEY`. Para otro motor, defina `DATABASE_URL` e instale su
 controlador, por ejemplo:
 
 ```bash

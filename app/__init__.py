@@ -1,4 +1,5 @@
 import os
+import secrets
 
 import click
 from flask import Flask, redirect, url_for
@@ -44,7 +45,7 @@ def create_app(config=None):
     os.makedirs(app.instance_path, exist_ok=True)
 
     app.config.update(
-        SECRET_KEY=os.environ.get("SECRET_KEY", "cambie-esta-clave-en-produccion"),
+        SECRET_KEY=os.environ.get("SECRET_KEY") or _clave_secreta(app.instance_path),
         SQLALCHEMY_DATABASE_URI=os.environ.get(
             "DATABASE_URL",
             "sqlite:///" + os.path.join(app.instance_path, "cae.db"),
@@ -96,6 +97,17 @@ def create_app(config=None):
 
     _registrar_comandos(app)
     return app
+
+
+def _clave_secreta(carpeta):
+    """Genera una clave secreta aleatoria la primera vez y la reutiliza, para
+    que las sesiones sobrevivan a los reinicios sin definir SECRET_KEY."""
+    ruta = os.path.join(carpeta, "secret_key")
+    if not os.path.exists(ruta):
+        with open(ruta, "w") as archivo:
+            archivo.write(secrets.token_hex(32))
+    with open(ruta) as archivo:
+        return archivo.read().strip()
 
 
 def _crear_superusuario_desde_entorno():
