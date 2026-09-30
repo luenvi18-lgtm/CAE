@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge_estado, csrf %}
+{% block titulo %}Entrada / Salida{% endblock %}
+{% block contenido %}
+<h1 class="h4 mb-3">Registrar entrada o salida de equipos</h1>
+<form class="row g-2 mb-4" method="get">
+  <div class="col-sm-8 col-md-6">
+    <input class="form-control form-control-lg" name="cedula" placeholder="Cédula del usuario" inputmode="numeric"
+           value="{{ cedula }}" required autofocus>
+  </div>
+  <div class="col-sm-4 col-md-2">
+    <button class="btn btn-primary btn-lg w-100"><i class="bi bi-search"></i> Consultar</button>
+  </div>
+</form>
+
+{% if usuario %}
+<div class="card shadow-sm mb-3">
+  <div class="card-body d-flex flex-wrap justify-content-between gap-2">
+    <div>
+      <div class="h5 mb-0">{{ usuario.nombre_completo }}</div>
+      <div class="text-muted">C.C. {{ usuario.cedula }} · {{ usuario.division }} · {{ usuario.rol_nombre }}</div>
+    </div>
+    <div class="d-flex gap-2 align-items-start">
+      <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('agente.historial', cedula=usuario.cedula) }}"><i class="bi bi-clock-history"></i> Historial</a>
+      {% if current_user.es_superusuario %}
+        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin.nuevo_equipo', cedula=usuario.cedula) }}"><i class="bi bi-plus-lg"></i> Equipo</a>
+        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin.editar_usuario', cedula=usuario.cedula) }}"><i class="bi bi-pencil"></i> Usuario</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% if usuario.equipos %}
+<div class="row g-3">
+  {% for equipo in usuario.equipos %}
+  <div class="col-md-6 col-xl-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <div class="fw-semibold"><i class="bi {{ 'bi-tablet' if equipo.tipo == 'Tablet' else 'bi-laptop' }}"></i> {{ equipo.descripcion }}</div>
+            <div class="small text-muted">S/N {{ equipo.serial or '—' }}</div>
+          </div>
+          {{ badge_estado(equipo.estado) }}
+        </div>
+        <div class="small text-muted mb-3">
+          Último movimiento: {{ equipo.ultimo_movimiento.fecha|fecha if equipo.ultimo_movimiento else 'ninguno' }}
+        </div>
+        {% set siguiente = 'salida' if equipo.estado == 'entrada' else 'entrada' %}
+        <form method="post" action="{{ url_for('agente.registrar_movimiento', equipo_id=equipo.id) }}">
+          {{ csrf() }}
+          <input type="hidden" name="tipo" value="{{ siguiente }}">
+          <input class="form-control form-control-sm mb-2" name="observacion" maxlength="255" placeholder="Observación (opcional)">
+          <button class="btn w-100 {{ 'btn-success' if siguiente == 'entrada' else 'btn-warning' }}">
+            {% if siguiente == 'entrada' %}<i class="bi bi-box-arrow-in-right"></i> Registrar entrada
+            {% else %}<i class="bi bi-box-arrow-right"></i> Registrar salida{% endif %}
+          </button>
+        </form>
+        {% if current_user.es_superusuario %}
+        <div class="d-flex gap-2 mt-2">
+          <a class="btn btn-sm btn-outline-primary flex-fill" href="{{ url_for('admin.editar_equipo', equipo_id=equipo.id) }}"><i class="bi bi-pencil"></i> Editar</a>
+          <form method="post" action="{{ url_for('admin.eliminar_equipo', equipo_id=equipo.id) }}" class="flex-fill"
+                onsubmit="return confirm('¿Eliminar este equipo y todo su historial?');">
+            {{ csrf() }}
+            <button class="btn btn-sm btn-outline-danger w-100"><i class="bi bi-trash"></i> Eliminar</button>
+          </form>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">Este usuario no tiene equipos registrados.</div>
+{% endif %}
+{% endif %}
+{% endblock %}

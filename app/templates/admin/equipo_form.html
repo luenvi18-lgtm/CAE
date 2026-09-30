@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf, select, campos_equipo with context %}
+{% block titulo %}{{ 'Editar equipo' if equipo else 'Nuevo equipo' }}{% endblock %}
+{% block contenido %}
+<div class="card shadow-sm mx-auto" style="max-width: 640px">
+  <div class="card-body p-4">
+    <h1 class="h4 mb-3">{{ 'Editar equipo' if equipo else 'Nuevo equipo' }}</h1>
+    <form method="post" class="row g-3">
+      {{ csrf() }}
+      <div class="col-12">
+        <label class="form-label" for="cedula_usuario">Cédula del propietario</label>
+        <input class="form-control" id="cedula_usuario" name="cedula_usuario" inputmode="numeric" required
+               value="{{ form.get('cedula_usuario', '') }}">
+      </div>
+      {{ campos_equipo(form) }}
+      {% if equipo %}
+      <div class="col-md-6">
+        {{ select('estado', 'Estado', ESTADOS, form.get('estado')) }}
+        <div class="form-text">Corrige el estado sin crear un movimiento en el historial.</div>
+      </div>
+      {% endif %}
+      <div class="col-12 d-flex gap-2">
+        <button class="btn btn-primary">Guardar</button>
+        <a class="btn btn-outline-secondary" href="{{ url_for('admin.equipos') }}">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

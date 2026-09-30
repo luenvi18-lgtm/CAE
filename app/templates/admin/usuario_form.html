@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf, select with context %}
+{% block titulo %}{{ 'Editar usuario' if usuario else 'Nuevo usuario' }}{% endblock %}
+{% block contenido %}
+<div class="card shadow-sm mx-auto" style="max-width: 640px">
+  <div class="card-body p-4">
+    <h1 class="h4 mb-3">{{ 'Editar usuario' if usuario else 'Nuevo usuario' }}</h1>
+    <form method="post" class="row g-3">
+      {{ csrf() }}
+      <div class="col-12">
+        <label class="form-label" for="cedula">Cédula</label>
+        {% if usuario %}
+          <input class="form-control" id="cedula" value="{{ usuario.cedula }}" disabled>
+          <div class="form-text">La cédula es la clave primaria y no se puede modificar.</div>
+        {% else %}
+          <input class="form-control" id="cedula" name="cedula" inputmode="numeric" pattern="\d{5,15}" required value="{{ form.get('cedula', '') }}">
+        {% endif %}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="nombres">Nombres</label>
+        <input class="form-control" id="nombres" name="nombres" maxlength="100" required value="{{ form.get('nombres', '') }}">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="apellidos">Apellidos</label>
+        <input class="form-control" id="apellidos" name="apellidos" maxlength="100" required value="{{ form.get('apellidos', '') }}">
+      </div>
+      <div class="col-md-6">{{ select('division', 'División', DIVISIONES, form.get('division'), vacio='Seleccione…') }}</div>
+      <div class="col-md-6">{{ select('rol', 'Rol', ROLES, form.get('rol', 'usuario')) }}</div>
+      <div class="col-12">
+        <label class="form-label" for="password">{{ 'Nueva contraseña' if usuario else 'Contraseña' }}</label>
+        <input class="form-control" id="password" name="password" type="password" minlength="6" {% if not usuario %}required{% endif %}>
+        {% if usuario %}<div class="form-text">Déjela en blanco para conservar la contraseña actual.</div>{% endif %}
+      </div>
+      <div class="col-12 d-flex gap-2">
+        <button class="btn btn-primary">Guardar</button>
+        <a class="btn btn-outline-secondary" href="{{ url_for('admin.usuarios') }}">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

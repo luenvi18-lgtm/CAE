@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf, select with context %}
+{% block titulo %}Editar movimiento{% endblock %}
+{% block contenido %}
+<div class="card shadow-sm mx-auto" style="max-width: 640px">
+  <div class="card-body p-4">
+    <h1 class="h4 mb-1">Editar movimiento</h1>
+    <p class="text-muted">{{ movimiento.equipo.descripcion }} · {{ movimiento.equipo.usuario.nombre_completo }} (C.C. {{ movimiento.equipo.cedula_usuario }})</p>
+    <form method="post" class="row g-3">
+      {{ csrf() }}
+      <div class="col-md-6">{{ select('tipo', 'Movimiento', ESTADOS, form.get('tipo')) }}</div>
+      <div class="col-md-6">
+        <label class="form-label" for="fecha">Fecha y hora</label>
+        <input class="form-control" type="datetime-local" id="fecha" name="fecha" required value="{{ form.get('fecha', '') }}">
+      </div>
+      <div class="col-12">
+        <label class="form-label" for="observacion">Observación</label>
+        <input class="form-control" id="observacion" name="observacion" maxlength="255" value="{{ form.get('observacion', '') }}">
+      </div>
+      <div class="col-12 form-text">El estado del equipo se recalcula a partir de su movimiento más reciente.</div>
+      <div class="col-12 d-flex gap-2">
+        <button class="btn btn-primary">Guardar</button>
+        <a class="btn btn-outline-secondary" href="{{ url_for('agente.historial') }}">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
